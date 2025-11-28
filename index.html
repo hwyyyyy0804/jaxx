@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>春节习俗时间轴配对</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #fef4f4 0%, #fff9f9 100%);
+            color: #d32f2f;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: linear-gradient(90deg, #d32f2f, #f57c00);
+            border-radius: 10px;
+            color: white;
+            box-shadow: 0 3px 10px rgba(211, 47, 47, 0.3);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        
+        .instructions {
+            background-color: #ffebee;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 5px solid #d32f2f;
+            text-align: center;
+            font-size: 1.5rem; /* 增大字体 */
+            font-weight: bold;
+        }
+        
+        .timeline-container {
+            position: relative;
+            margin: 30px 0;
+            padding: 20px 0;
+            min-height: 150px;
+        }
+        
+        .timeline {
+            position: relative;
+            height: 70px;
+            margin: 0 50px;
+        }
+        
+        .timeline-line {
+            position: absolute;
+            top: 170px; /* 调整时间线位置，在日期文字下方 */
+            left: 0;
+            right: 0;
+            height: 3px;
+            background-color: #d32f2f;
+        }
+        
+        .timeline-points {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 0 50px;
+        }
+        
+        .timeline-point {
+            text-align: center;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* 调整各节日之间的间距 */
+        .timeline-point:nth-child(1) { /* 腊八 */
+            margin-right: 180px;
+        }
+        
+        .timeline-point:nth-child(2) { /* 除夕 */
+            margin-right: 20px;
+        }
+        
+        .timeline-point:nth-child(3) { /* 春节 */
+            margin-right: 180px;
+        }
+        
+        .timeline-point:nth-child(4) { /* 元宵 */
+            /* 不需要右边距 */
+        }
+        
+        /* 在红色时间线上添加黑色点标记 */
+        .timeline-point::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background-color: #000;
+            border-radius: 50%;
+            top: 95px; /* 调整位置使其正好在红色时间线上 */
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+        
+        .point {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #d32f2f, #f57c00);
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .point:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .date-label {
+            font-size: 1rem;
+            color: #666;
+            margin-top: 5px;
+            position: absolute;
+            top: 65px; /* 日期标签在时间线上方 */
+            white-space: nowrap;
+        }
+        
+        .drop-zones {
+            display: flex;
+            justify-content: space-between;
+            margin: 70px 50px 0; /* 调整放置区域的位置，向上移动 */
+        }
+        
+        .drop-zone {
+            width: 120px;
+            min-height: 150px;
+            border: 2px dashed #e57373;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            padding: 10px;
+            background-color: rgba(255, 235, 238, 0.5);
+            transition: all 0.3s;
+        }
+        
+        /* 调整放置区域的位置以匹配时间轴 */
+        .drop-zone:nth-child(1) { /* 腊八 */
+            margin-right: 180px;
+        }
+        
+        .drop-zone:nth-child(2) { /* 除夕 */
+            margin-right: 20px;
+        }
+        
+        .drop-zone:nth-child(3) { /* 春节 */
+            margin-right: 180px;
+        }
+        
+        .drop-zone.highlight {
+            border-color: #d32f2f;
+            background-color: rgba(255, 235, 238, 0.9);
+            box-shadow: 0 0 10px rgba(211, 47, 47, 0.5);
+        }
+        
+        .images-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin: 40px 0 20px;
+            padding: 20px;
+            background-color: #ffebee;
+            border-radius: 10px;
+        }
+        
+        .image-item {
+            width: 120px;
+            cursor: grab;
+            transition: transform 0.3s;
+            text-align: center;
+        }
+        
+        .image-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        .image-item img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+            border: 3px solid white;
+        }
+        
+        .image-label {
+            margin-top: 8px;
+            font-weight: bold;
+            color: #d32f2f;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .timeline-points, .drop-zones {
+                margin: 0 10px;
+            }
+            
+            .timeline-point, .drop-zone {
+                width: 80px;
+            }
+            
+            .point {
+                width: 50px;
+                height: 50px;
+                font-size: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            /* 移动端调整间距 */
+            .timeline-point:nth-child(1),
+            .timeline-point:nth-child(3) {
+                margin-right: 100px;
+            }
+            
+            .drop-zone:nth-child(1),
+            .drop-zone:nth-child(3) {
+                margin-right: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🐉 春节习俗时间轴配对 🧧</h1>
+            <div class="subtitle">道法课堂活动 - 了解春节传统习俗</div>
+        </header>
+        
+        <div class="instructions">
+            <p>请将图片拖拽到时间轴上对应的节日区域</p>
+        </div>
+        
+        <div class="timeline-container">
+            <div class="timeline">
+                <div class="timeline-line"></div>
+            </div>
+            
+            <div class="timeline-points">
+                <div class="timeline-point">
+                    <div class="point">腊八</div>
+                    <div class="date-label">腊月初八</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="point">除夕</div>
+                    <div class="date-label">腊月三十</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="point">春节</div>
+                    <div class="date-label">正月初一</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="point">元宵</div>
+                    <div class="date-label">正月十五</div>
+                </div>
+            </div>
+            
+            <div class="drop-zones">
+                <div class="drop-zone" id="zone-lab8" data-festival="腊八"></div>
+                <div class="drop-zone" id="zone-chuxi" data-festival="除夕"></div>
+                <div class="drop-zone" id="zone-spring" data-festival="春节"></div>
+                <div class="drop-zone" id="zone-lantern" data-festival="元宵"></div>
+            </div>
+        </div>
+        
+        <div class="images-container" id="images-container">
+            <!-- 图片将由JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <script>
+        // 春节习俗数据 - 6个图片
+        const customsData = [
+            { id: 1, name: "喝腊八粥", festival: "腊八", img: "https://images.unsplash.com/photo-1549366026-934b6a0e04f8?w=120&h=100&fit=crop" },
+            { id: 2, name: "贴春联", festival: "除夕", img: "https://images.unsplash.com/photo-1586769852044-692c82fd81b9?w=120&h=100&fit=crop" },
+            { id: 3, name: "团圆饭", festival: "除夕", img: "https://images.unsplash.com/photo-1541518763669-7f2c2a42c4dd?w=120&h=100&fit=crop" },
+            { id: 4, name: "拜年", festival: "春节", img: "https://images.unsplash.com/photo-1611251438489-7e56e9e5c1a2?w=120&h=100&fit=crop" },
+            { id: 5, name: "给压岁钱", festival: "春节", img: "https://images.unsplash.com/photo-1549366026-934b6a0e04f8?w=120&h=100&fit=crop" },
+            { id: 6, name: "赏花灯", festival: "元宵", img: "https://images.unsplash.com/photo-1549366026-934b6a0e04f8?w=120&h=100&fit=crop" }
+        ];
+
+        // 打乱图片顺序
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        const shuffledCustoms = shuffleArray([...customsData]);
+
+        // 初始化图片区域
+        function initImages() {
+            const imagesContainer = document.getElementById('images-container');
+            imagesContainer.innerHTML = ''; // 清空
+
+            shuffledCustoms.forEach(custom => {
+                const imgItem = document.createElement('div');
+                imgItem.className = 'image-item';
+                imgItem.draggable = true;
+                imgItem.id = `img-${custom.id}`;
+                imgItem.setAttribute('data-festival', custom.festival);
+                imgItem.ondragstart = drag;
+
+                const img = document.createElement('img');
+                img.src = custom.img;
+                img.alt = custom.name;
+
+                const label = document.createElement('div');
+                label.className = 'image-label';
+                label.textContent = custom.name;
+
+                imgItem.appendChild(img);
+                imgItem.appendChild(label);
+                imagesContainer.appendChild(imgItem);
+            });
+        }
+
+        // 拖拽开始
+        function drag(event) {
+            event.dataTransfer.setData('text/plain', event.target.id);
+        }
+
+        // 设置拖放区域事件
+        function setupDropZones() {
+            const dropZones = document.querySelectorAll('.drop-zone');
+            
+            dropZones.forEach(zone => {
+                zone.addEventListener('dragover', event => {
+                    event.preventDefault();
+                    zone.classList.add('highlight');
+                });
+                
+                zone.addEventListener('dragleave', () => {
+                    zone.classList.remove('highlight');
+                });
+                
+                zone.addEventListener('drop', event => {
+                    event.preventDefault();
+                    zone.classList.remove('highlight');
+                    
+                    const id = event.dataTransfer.getData('text/plain');
+                    const draggableElement = document.getElementById(id);
+                    
+                    // 将图片放入放置区域
+                    zone.appendChild(draggableElement);
+                    draggableElement.style.cursor = 'default';
+                });
+            });
+        }
+
+        // 页面加载时初始化
+        window.onload = function() {
+            initImages();
+            setupDropZones();
+        };
+    </script>
+</body>
+</html>
